@@ -9,6 +9,7 @@
           (numero symbolic simplify-remove-sub)
           (numero symbolic simplify-add-canonical)
           (numero symbolic simplify-mul-canonical)
+          (numero symbolic simplify-div-canonical)
           (numero symbolic simplify-add-constants)
           (numero symbolic simplify-add-like-terms)
           (numero symbolic simplify-mul-constants)
@@ -44,12 +45,10 @@
 
   (define (simplify expr)
 
-    (let ((expr (rewrite (compose-in-order 
-                                           simplify-add-canonical
-                                           
+    (let ((expr (rewrite (compose-in-order simplify-add-canonical
                                            simplify-remove-sub
-                                           
                                            simplify-mul-canonical
+                                           simplify-div-canonical
                                            simplify-add-constants
                                            simplify-add-like-terms
                                            simplify-mul-constants
