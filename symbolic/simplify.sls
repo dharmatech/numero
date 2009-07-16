@@ -44,8 +44,11 @@
 
   (define (simplify expr)
 
-    (let ((expr (rewrite (compose-in-order simplify-remove-sub
+    (let ((expr (rewrite (compose-in-order 
                                            simplify-add-canonical
+                                           
+                                           simplify-remove-sub
+                                           
                                            simplify-mul-canonical
                                            simplify-add-constants
                                            simplify-add-like-terms
@@ -54,6 +57,10 @@
                                            simplify-pow)
                          expr)))
 
-      (rewrite simplify-pretty expr)))
+
+
+      (rewrite (compose-in-order simplify-pretty
+                                 simplify-mul-constants)
+               expr)))
 
   )
