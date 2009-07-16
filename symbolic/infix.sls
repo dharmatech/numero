@@ -91,7 +91,7 @@
                                   (cdr operands))
                             (cdr operators)))))
 
-    (display (list 'shunting-yard expr operands operators)) (newline)
+    ;; (display (list 'shunting-yard expr operands operators)) (newline)
 
     (if (null? expr)
         
