@@ -48,6 +48,13 @@
 
   (define (exponent expr)
     (match expr
+
+      ;; (a ^ b) ^ c    a ^ (b * c)
+
+      ( ('^ ('^ a b) c)
+
+        (exponent `(^ ,a (* ,b ,c))))
+      
       ( ('^ a b) b )
       ( else 1 )))
   
