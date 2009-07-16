@@ -48,3 +48,20 @@
 
 "-4680 * (cos x) ^ 2 * (sin x) ^ 8 + 5040 * (cos x) ^ 4 * (sin x) ^ 6 + 280 * (sin x) ^ 10"
 
+;; 8.49 Mendelson
+
+(to-alg
+ (simplify
+  (expand-loop
+   (D (infix '( (x ^ 2 - 3) / (x + 4) )) 'x))))
+
+"(x ^ 2 + 8 * x + 3) / (8 * x + x ^ 2 + 16)"
+
+;; 8.50 Mendelson
+
+(to-alg
+ (simplify
+  (D (infix '( (x ^ 5 - x + 2) / (x ^ 3 + 7) )) 'x)))
+
+"((5 * x ^ 4 - 1) * (x ^ 3 + 7) - 3 * x ^ 2 * (x ^ 5 - 1 * x + 2)) / (x ^ 3 + 7) ^ 2"
+
