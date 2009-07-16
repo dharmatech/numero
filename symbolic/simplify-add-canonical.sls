@@ -11,12 +11,14 @@
       ;; (a + (b + c))	((a + b) + c)
       ( ('+ a ('+ b c)) `(+ (+ ,a ,b) ,c) )
 
-      ;; (a - (b + c))	(a - b) - c
-      ( ('- a ('+ b c)) `(- (- ,a ,b) ,c) )
+      ;; (a + (b - c))  ((a + b) - c)
+      ( ('+ a ('- b c)) `(- (+ ,a ,b) ,c) )
 
       ;; (a - (b - c))	(a - b) + c
-
       ( ('- a ('- b c)) `(+ (- ,a ,b) ,c) )
+
+      ;; (a - (b + c))	(a - b) - c
+      ( ('- a ('+ b c)) `(- (- ,a ,b) ,c) )
       
       ((? list?) (map simplify-add-canonical expr))
       (else expr)))
