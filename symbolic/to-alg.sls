@@ -26,6 +26,11 @@
 
       ( (? number?) (number->string expr) )
 
+      ( ('= a b)
+        (let ((n (precedence '=)))
+          (let ((str (string-append (alg a n) " = " (alg b n))))
+            (if (< n m) (wrap-parens str) str))) )
+
       ( ('+ a b)
         (let ((n (precedence '+)))
           (let ((str (string-append (alg a n) " + " (alg b n))))
