@@ -20,6 +20,12 @@
 
       ( ('+ a (? negative-number? b)) `(- ,a ,(- b)) )
 
+      ;; a * b ^ n    a / b ^ n
+
+      ( ('* a ('^ b (? negative-number? n)))
+
+        `(/ ,a (^ ,b ,(- n))) )
+
       ((? list?) (map simplify-pretty expr))
 
       (else expr)))
