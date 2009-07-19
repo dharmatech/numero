@@ -25,6 +25,8 @@
         (lambda (x)
           ((compose-in-order f ...) (g x))))))
 
+  ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
   ;; (define (simplify expr)
 
   ;;   (let ((expr (rewrite simplify-remove-sub expr)))
@@ -43,23 +45,49 @@
 
   ;;                 expr))))))))
 
+  ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  ;; (define (simplify expr)
+
+  ;;   (let ((expr (rewrite (compose-in-order simplify-add-canonical
+  ;;                                          simplify-remove-sub
+  ;;                                          simplify-mul-canonical
+  ;;                                          simplify-div-canonical
+  ;;                                          simplify-add-constants
+  ;;                                          simplify-add-like-terms
+  ;;                                          simplify-mul-constants
+  ;;                                          simplify-mul-factors
+  ;;                                          simplify-pow)
+  ;;                        expr)))
+
+
+
+  ;;     (rewrite (compose-in-order simplify-pretty
+  ;;                                simplify-mul-constants)
+  ;;              expr)))
+
+  ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
   (define (simplify expr)
 
-    (let ((expr (rewrite (compose-in-order simplify-add-canonical
-                                           simplify-remove-sub
-                                           simplify-mul-canonical
-                                           simplify-div-canonical
-                                           simplify-add-constants
-                                           simplify-add-like-terms
-                                           simplify-mul-constants
-                                           simplify-mul-factors
-                                           simplify-pow)
-                         expr)))
+    (let ((expr (rewrite simplify-add-canonical expr)))
 
+      (let ((expr (rewrite (compose-in-order simplify-remove-sub
+                                             simplify-mul-canonical
+                                             simplify-div-canonical
+                                             simplify-add-constants
+                                             simplify-add-like-terms
+                                             simplify-mul-constants
+                                             simplify-mul-factors
+                                             simplify-pow)
+                           expr)))
 
+        (rewrite (compose-in-order simplify-pretty
+                                   simplify-mul-constants
+                                   simplify-pow
+                                   )
+                 expr))))
 
-      (rewrite (compose-in-order simplify-pretty
-                                 simplify-mul-constants)
-               expr)))
+  ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
   )
