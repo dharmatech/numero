@@ -34,6 +34,14 @@
 
       ( ('cos x) `(* (- (sin ,x)) ,(Dv x)) )
 
+      ( ('= a b) `(= ,(Dv a) ,(Dv b)) )
+
+      ( (and (f x)
+
+             (?   (lambda (_)   (eq? x var)   )))
+
+        `(D (,f ,x) ,var) )
+
       ))
 
   )
