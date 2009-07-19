@@ -1,23 +1,29 @@
 
 (library (numero symbolic expand)
 
-  (export expand expand-loop)
+  (export expand)
 
-  (import (rnrs) (xitomatl AS-match))
+  (import (rnrs) (xitomatl AS-match)
+          (numero symbolic rewrite)
+          )
 
-  ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;; ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
   (define (expand-mul expr)
 
     (match expr
 
+      ;; a * (b + c)    a b + a c
+
       ( (or ('* a ('+ b c)) ('* ('+ b c) a)) `(+ (* ,a ,b) (* ,a ,c)) )
+
+      ;; a * (b - c)    a b - a c
 
       ( (or ('* a ('- b c)) ('* ('- b c) a)) `(- (* ,a ,b) (* ,a ,c)) )
 
-      ( ('* a b) `(* ,(expand a) ,(expand b)) )
-
-      ))
+      ((? list?) (map expand-mul expr))
+      
+      (else expr)))
 
   ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -25,44 +31,31 @@
 
     (match expr
 
-      ( ('^ a 1) a )
+      ;; a ^ 1    a
+      
+      (('^ a 1) a)
 
-      ( ('^ ('+ a b) (? (lambda (n) (and (number? n) (>= n 2))) n))
+      ;; (a + b) ^ 5    (a + b) * (a + b) ^ 4
 
-        (expand `(* (+ ,a ,b) (^ (+ ,a ,b) ,(- n 1)))) )
+      (('^ ('+ a b) (? (lambda (n) (and (number? n) (>= n 2))) n))
 
-      ( ('^ ('- a b) (? (lambda (n) (and (number? n) (>= n 2))) n))
+       `(* (+ ,a ,b) (^ (+ ,a ,b) ,(- n 1))))
 
-        (expand `(* (- ,a ,b) (^ (+ ,a ,b) ,(- n 1)))) )
+      ;; (a - b) ^ 5    (a - b) * (a - b) ^ 4
 
-      ( else expr )))
+      (('^ ('- a b) (? (lambda (n) (and (number? n) (>= n 2))) n))
+
+       `(* (- ,a ,b) (^ (- ,a ,b) ,(- n 1))))
+
+      ((? list?) (map expand-pow expr))
+      
+      (else expr)))
 
   ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
   (define (expand expr)
-
-    (match expr
-
-      ( ('* a b) (expand-mul expr) )
-
-      ( ('^ a b) (expand-pow expr) )
-
-      ( ('+ a b) `(+ ,(expand a) ,(expand b)) )
-
-      ( ('- a b) `(- ,(expand a) ,(expand b)) )
-
-      ( ('/ a b) `(/ ,(expand a) ,(expand b)) )
-
-      ( else expr )))
-
-  ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-  (define (expand-loop old)
-    (let ((new (expand old)))
-      (if (equal? old new)
-          old
-          (expand-loop new))))
-
-  ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    (rewrite (lambda (expr)
+               (expand-pow (expand-mul expr)))
+             expr))
 
   )
