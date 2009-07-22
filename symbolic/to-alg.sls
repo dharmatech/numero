@@ -56,6 +56,16 @@
           (let ((str (string-append (alg a n) " ^ " (alg b n))))
             (if (< n m) (wrap-parens str) str))) )
 
+      ( ('sin x)
+        (let ((n 100))
+          (let ((str (string-append "sin " (alg x n))))
+            (if (< n m) (wrap-parens str) str))) )
+
+      ( ('cos x)
+        (let ((n 100))
+          (let ((str (string-append "cos " (alg x n))))
+            (if (< n m) (wrap-parens str) str))) )
+
       ( else
 
         (call-with-string-output-port
