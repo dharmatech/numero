@@ -284,3 +284,41 @@
 
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; Example 2.14
+
+;; Find the equation of the tangent plane to the surface x^2 + y^2 + z^2 = 9
+;; at the point (2, 2, -1).
+
+(define F (infix '(x ^ 2 + y ^ 2 + z ^ 2 - 9)))
+
+(define (dF/dx x y z)
+  (simplify
+   (subst (D F 'x) (x x) (y y) (z z))))
+
+(define (dF/dy x y z)
+  (simplify
+   (subst (D F 'y) (x x) (y y) (z z))))
+
+(define (dF/dz x y z)
+  (simplify
+   (subst (D F 'z) (x x) (y y) (z z))))
+
+(define a  2)
+(define b  2)
+(define c -1)
+
+(to-alg
+ (simplify
+  (simplify
+   (simplify
+    (infix `( ,(dF/dx a b c) * (x - ,a)
+              +
+              ,(dF/dy a b c) * (y - ,b)
+              +
+              ,(dF/dz a b c) * (z - ,c)
+              = 0 ))))))
+
+"-18 + 4 * x + 4 * y - 2 * z = 0"
+
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
