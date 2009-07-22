@@ -1,6 +1,7 @@
 
 (import (numero symbolic infix)
         (numero symbolic to-alg)
+        (numero symbolic rewrite)
         (numero symbolic simplify)
         (numero symbolic derivative)
         (numero symbolic expand)
@@ -253,6 +254,8 @@
 "3 * y ^ 2 + 2 * e ^ (x ^ 2 * y) * x ^ 3 * y + 2 * e ^ (x ^ 2 * y) * x"
 
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; 2.3 Tangent Plane to a Surface
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Example 2.13
 
@@ -319,6 +322,87 @@
               = 0 ))))))
 
 "-18 + 4 * x + 4 * y - 2 * z = 0"
+
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; 2.3 Exercises
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define (tangent-plane F)
+
+  (define (dF/dx x y z)
+    (simplify
+     (subst (D F 'x) (x x) (y y) (z z))))
+
+  (define (dF/dy x y z)
+    (simplify
+     (subst (D F 'y) (x x) (y y) (z z))))
+
+  (define (dF/dz x y z)
+    (simplify
+     (subst (D F 'z) (x x) (y y) (z z))))
+
+  (lambda (a b c)
+
+    (rewrite
+
+     simplify
+
+     (infix `( ,(dF/dx a b c) * (x - ,a)
+               +
+               ,(dF/dy a b c) * (y - ,b)
+               +
+               ,(dF/dz a b c) * (z - ,c)
+               = 0 )))))
+
+;; 1
+
+(let ((F (infix '( x ^ 2 + y ^ 3 - z ))))
+
+  (to-alg
+
+    ((tangent-plane F) 1 1 2)))
+
+"-3 + 2 * x + 3 * y - z = 0"
+
+;; 3
+
+(let ((F (infix '( x ^ 2 y - z ))))
+
+  (to-alg
+
+    ((tangent-plane F) -1 1 1)))
+
+"-2 * x - 2 + y - z = 0"
+
+;; 5
+
+(let ((F (infix '( x + 2 y - z ))))
+
+  (to-alg
+
+    ((tangent-plane F) 2 1 4)))
+
+"x + 2 * y - z = 0"
+
+;; 7
+
+(let ((F (infix '( x ^ 2 / 4 + y ^ 2 / 9 + z ^ 2 / 16 - 1 ))))
+
+  (to-alg
+
+    ((tangent-plane F) 1 2 (/ (* 2 (sqrt 11)) 3))))
+
+"-2.0 + 1/2 * x + 4/9 * y + 0.2763853991962833 * z = 0"
+
+;; 9
+
+(let ((F (infix '( x ^ 2 + y ^ 2 - z ^ 2 ))))
+
+  (to-alg
+
+    ((tangent-plane F) 3 4 5)))
+
+"6 * x + 8 * y - 10 * z = 0"
 
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
