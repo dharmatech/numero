@@ -254,3 +254,33 @@
 
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; Example 2.13
+
+;; Find the equation of the tangent plane to the surface z = x^2 + y^2 at the
+;; point (1, 2, 5).
+
+(define f (infix '(x ^ 2 + y ^ 2)))
+
+(define (df/dx x y)
+  (simplify
+   (subst (D f 'x) (x x) (y y))))
+
+(define (df/dy x y)
+  (simplify
+   (subst (D f 'y) (x x) (y y))))
+
+(define a 1)
+(define b 2)
+(define c (simplify (subst f (x 1) (y 2))))
+
+(to-alg
+ (simplify
+  (simplify
+   (expand
+    (infix
+     `( ,(df/dx a b) * (x - ,a) + ,(df/dy a b) * (y - ,b) - z + ,c = 0 ))))))
+
+"-5 + 2 * x + 4 * y - z = 0"
+
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
