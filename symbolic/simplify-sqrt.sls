@@ -12,16 +12,10 @@
     (match expr
 
       ( ('sqrt (? number? n))
-
         (let ((val (sqrt n)))
-
           (if (simplify-exact?)
-
               (if (exact? val) val expr)
-
-              val)))
-
-      ( (? list?) (map simplify-sqrt expr) )
+              val)) )
 
       ( else expr )))
 

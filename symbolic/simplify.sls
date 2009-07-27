@@ -27,13 +27,22 @@
           (numero symbolic simplify-remove-sub)
 
           (numero symbolic simplify-pow)
+
+          (numero symbolic simplify-sqrt)
+
+          (numero symbolic simplify-add-vector)
+          (numero symbolic simplify-sub-vector)
+          (numero symbolic simplify-mul-vector)
+          (numero symbolic simplify-div-vector)
+
+          (numero symbolic simplify-pow-vector)
+
+          (numero symbolic simplify-norm)
+          (numero symbolic simplify-dot)
+          (numero symbolic simplify-normalize)
           
-          ;; (numero symbolic simplify-div-canonical)
-          ;; (numero symbolic simplify-add-constants)
-          
-          ;; (numero symbolic simplify-sqrt)
-          ;; (numero symbolic simplify-dot)
           ;; (numero symbolic simplify-pretty)
+          
           ;; (numero symbolic simplify-abs)
 
           )
@@ -44,36 +53,6 @@
       ( (compose g f ...)
         (lambda (x)
           ((compose-in-order f ...) (g x))))))
-
-  ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-  ;; (define (simplify expr)
-
-  ;;   (if (vector? expr)
-
-  ;;       (vector-map simplify expr)
-
-  ;;       (let ((expr (rewrite simplify-add-canonical expr)))
-
-  ;;         (let ((expr (rewrite (compose-in-order simplify-remove-sub
-  ;;                                                simplify-mul-canonical
-  ;;                                                simplify-div
-  ;;                                                simplify-sqrt
-  ;;                                                simplify-div-canonical
-  ;;                                                simplify-add-constants
-  ;;                                                simplify-add-like-terms
-  ;;                                                simplify-mul-constants
-  ;;                                                simplify-mul-factors
-  ;;                                                simplify-pow
-  ;;                                                simplify-dot
-  ;;                                                simplify-abs)
-  ;;                              expr)))
-
-  ;;           (rewrite (compose-in-order simplify-pretty
-  ;;                                      simplify-mul-constants
-  ;;                                      simplify-pow
-  ;;                                      )
-  ;;                    expr)))))
 
   ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -97,20 +76,52 @@
 
                       simplify-pow
 
+                      simplify-sqrt
+
+                      simplify-add-vector
+                      simplify-sub-vector
+                      simplify-mul-vector
+                      simplify-div-vector
+
+                      simplify-pow-vector
+
+                      simplify-norm
+                      simplify-dot
+                      simplify-normalize
+
                       ))
 
+  (define simplify-step-pre  (compose-in-order simplify-step simplify-from-div))
+  (define simplify-step-post (compose-in-order simplify-step simplify-to-div))
+
   ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-  (define (simplify-basic expr)
+  (define (simplify-pre expr)
 
-    (let ((expr (cond ((list?   expr) (map        simplify-basic expr))
-                      ((vector? expr) (vector-map simplify-basic expr))
+    (let ((expr (cond ((list?   expr) (map        simplify-pre expr))
+                      ((vector? expr) (vector-map simplify-pre expr))
                       (else expr))))
 
-      (simplify-step expr)))
+      (simplify-step-pre expr)))
+
+  (define (simplify-post expr)
+
+    (let ((expr (cond ((list?   expr) (map        simplify-post expr))
+                      ((vector? expr) (vector-map simplify-post expr))
+                      (else expr))))
+
+      (simplify-step-post expr)))
 
   ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-  (define (simplify expr) (rewrite simplify-basic expr))
+  (define (simplify expr)
+    
+    (let ((expr (rewrite simplify-pre expr)))
+
+      (let ((expr (rewrite simplify-post expr)))
+
+        expr)))
+
+  ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
   )

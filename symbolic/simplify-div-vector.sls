@@ -1,39 +1,28 @@
 
-(library (numero symbolic simplify-div)
+(library (numero symbolic simplify-div-vector)
 
-  (export simplify-div)
+  (export simplify-div-vector)
 
   (import (rnrs)
           (xitomatl AS-match)
           (numero symbolic simplify-parameters))
 
-  (define (simplify-div expr)
+  (define (simplify-div-vector expr)
 
     (match expr
 
-      ( ('/ (? number? a) (? number? b))
+      (('/ (? vector? a) (? vector? b))
 
-        (let ((val (/ a b)))
+       (vector-map (lambda (elt-a elt-b) `(/ ,elt-a ,elt-b))
+                   a
+                   b))
 
-          (if (simplify-exact?)
+      (('/ (? vector? a) (? number? n))
+       (vector-map (lambda (elt-a) `(/ ,elt-a ,n)) a))
 
-              (if (exact? val) val expr)
+      (('/ (? number? n) (? vector? a))
+       (vector-map (lambda (elt-a) `(/ ,n ,elt-a)) a))
 
-              val)) )
-
-      ( ('/ (? vector? a) (? vector? b))
-
-        (vector-map (lambda (elt-a elt-b) `(/ ,elt-a ,elt-b))
-                    a
-                    b) )
-
-      ( ('/ (? vector? a) (? number? b))
-
-        (vector-map (lambda (elt) `(/ ,elt ,b))
-                    a) )
-
-      ( (? list?) (map simplify-div expr) )
-
-      ( else expr )))
+      (else expr)))
 
   )

@@ -8,18 +8,13 @@
           (xitomatl AS-match))
 
   (define (simplify-dot expr)
-
     (match expr
-      
-      ( ('dot (? vector? u) (? vector? v))
-
-        (vector-fold (lambda (i x y)
-                       `(+ ,x ,y))
+      (('dot (? vector? u) (? vector? v))
+        (vector-fold (lambda (i x y) `(+ ,x ,y))
                      0
-                     (vector-map (lambda (a b) `(* ,a ,b)) u v)) )
-
-      ((? list?) (map simplify-dot expr))
-
+                     (vector-map (lambda (a b) `(* ,a ,b))
+                                 u
+                                 v)))
       (else expr)))
 
   )
