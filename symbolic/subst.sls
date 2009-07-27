@@ -31,6 +31,8 @@
 
           ((list? expr) (map subst expr))
 
+          ((vector? expr) (vector-map subst expr))
+
           (else expr)))
 
   (define (substitute expr . rest)

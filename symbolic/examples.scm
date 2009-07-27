@@ -3,6 +3,7 @@
         (numero symbolic to-alg)
         (numero symbolic rewrite)
         (numero symbolic simplify)
+        (numero symbolic simplify-parameters)
         (numero symbolic derivative)
         (numero symbolic expand)
         (numero symbolic solve-for)
@@ -36,8 +37,7 @@
 
 (to-alg
  (simplify
-  (simplify
-   (D (infix '( (3 x - 2) / (2 x + 5) )) 'x))))
+  (D (infix '( (3 x - 2) / (2 x + 5) )) 'x)))
 
 "19 / (2 * x + 5) ^ 2"
 
@@ -83,10 +83,9 @@
 
 (to-alg
  (simplify
-  (simplify
-   (expand
-    (simplify
-     (D (infix '( (3 x ^ 7 + x ^ 5 - 2 x ^ 4 + x - 3) / x ^ 4 )) 'x))))))
+  (expand
+   (simplify
+    (D (infix '( (3 x ^ 7 + x ^ 5 - 2 x ^ 4 + x - 3) / x ^ 4 )) 'x)))))
 
 "-3 / x ^ 4 + 9 * x ^ 2 + 1 + 12 / x ^ 5"
 
@@ -102,9 +101,8 @@
 
 (to-alg
  (simplify
-  (simplify
-   (expand
-    (infix '((a - b) ^ 3))))))
+  (expand
+   (infix '((a - b) ^ 3)))))
 
 "-3 * a ^ 2 * b + 3 * a * b ^ 2 + a ^ 3 - b ^ 3"
 
@@ -278,10 +276,9 @@
 
 (to-alg
  (simplify
-  (simplify
-   (expand
-    (infix
-     `( ,(df/dx a b) * (x - ,a) + ,(df/dy a b) * (y - ,b) - z + ,c = 0 ))))))
+  (expand
+   (infix
+    `( ,(df/dx a b) * (x - ,a) + ,(df/dy a b) * (y - ,b) - z + ,c = 0 )))))
 
 "-5 + 2 * x + 4 * y - z = 0"
 
@@ -312,7 +309,7 @@
 
 (to-alg
  (simplify
-  (simplify
+  (expand
    (simplify
     (infix `( ,(dF/dx a b c) * (x - ,a)
               +
@@ -343,16 +340,45 @@
 
   (lambda (a b c)
 
-    (rewrite
+    (simplify
 
-     simplify
+     (expand
 
-     (infix `( ,(dF/dx a b c) * (x - ,a)
-               +
-               ,(dF/dy a b c) * (y - ,b)
-               +
-               ,(dF/dz a b c) * (z - ,c)
-               = 0 )))))
+      (infix `( ,(dF/dx a b c) * (x - ,a)
+                +
+                ,(dF/dy a b c) * (y - ,b)
+                +
+                ,(dF/dz a b c) * (z - ,c)
+                = 0 ))))))
+
+(define (tangent-plane F)
+
+  (define (dF/dx x y z)
+    (subst (D F 'x) (x x) (y y) (z z)))
+
+  (define (dF/dy x y z)
+    (subst (D F 'y) (x x) (y y) (z z)))
+
+  (define (dF/dz x y z)
+    (subst (D F 'z) (x x) (y y) (z z)))
+
+  (define formula
+    (infix
+     '( dF/dx * (x - a) + dF/dy * (y - b) + dF/dz * (z - c) = 0 )))
+
+  (lambda (a b c)
+
+    (simplify
+
+     (expand
+
+      (subst formula
+             (dF/dx (dF/dx a b c))
+             (dF/dy (dF/dy a b c))
+             (dF/dz (dF/dz a b c))
+             (a a)
+             (b b)
+             (c c))))))
 
 ;; 1
 
@@ -360,7 +386,7 @@
 
   (to-alg
 
-    ((tangent-plane F) 1 1 2)))
+   ((tangent-plane F) 1 1 2)))
 
 "-3 + 2 * x + 3 * y - z = 0"
 
@@ -370,7 +396,7 @@
 
   (to-alg
 
-    ((tangent-plane F) -1 1 1)))
+   ((tangent-plane F) -1 1 1)))
 
 "-2 * x - 2 + y - z = 0"
 
@@ -380,17 +406,19 @@
 
   (to-alg
 
-    ((tangent-plane F) 2 1 4)))
+   ((tangent-plane F) 2 1 4)))
 
 "x + 2 * y - z = 0"
 
 ;; 7
 
-(let ((F (infix '( x ^ 2 / 4 + y ^ 2 / 9 + z ^ 2 / 16 - 1 ))))
+(parameterize ((simplify-exact? #f))
 
-  (to-alg
+  (let ((F (infix '( x ^ 2 / 4 + y ^ 2 / 9 + z ^ 2 / 16 - 1 ))))
 
-    ((tangent-plane F) 1 2 (/ (* 2 (sqrt 11)) 3))))
+    (to-alg
+
+     ((tangent-plane F) 1 2 (/ (* 2 (sqrt 11)) 3)))))
 
 "-2.0 + 1/2 * x + 4/9 * y + 0.2763853991962833 * z = 0"
 
@@ -400,7 +428,7 @@
 
   (to-alg
 
-    ((tangent-plane F) 3 4 5)))
+   ((tangent-plane F) 3 4 5)))
 
 "6 * x + 8 * y - 10 * z = 0"
 

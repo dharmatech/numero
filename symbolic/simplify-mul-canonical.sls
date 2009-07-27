@@ -35,7 +35,6 @@
       (('* ('* a b) c) `(* ,a (* ,b ,c)))
       ((and ('* a b) (? (lambda (x) (mul-element<? b a)))) `(* ,b ,a))
       ((and ('* a ('* b c)) (? (lambda (x) (mul-element<? b a)))) `(* ,b (* ,a ,c)))
-      ((? list?) (map simplify-mul-canonical expr))
       (else expr)))
 
   ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

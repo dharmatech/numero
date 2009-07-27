@@ -3,7 +3,10 @@
 
   (export to-alg)
 
-  (import (rnrs) (xitomatl AS-match))
+  (import (rnrs)
+          (only (srfi :13) string-join)
+          (xitomatl AS-match)
+          )
 
   (define precedence-table
     '((sentinel . 0)
@@ -65,6 +68,16 @@
         (let ((n 100))
           (let ((str (string-append "cos " (alg x n))))
             (if (< n m) (wrap-parens str) str))) )
+
+      ( (? vector?)
+
+        (string-append "<"
+                       (string-join
+                        (vector->list (vector-map to-alg expr))
+                        " , ")
+                       ">")
+
+        )
 
       ( else
 

@@ -1,21 +1,41 @@
 
 (library (numero symbolic simplify)
 
-  (export simplify)
+  (export simplify simplify-step)
 
   (import (rnrs)
           (xitomatl AS-match)
+
           (numero symbolic rewrite)
-          (numero symbolic simplify-remove-sub)
+
           (numero symbolic simplify-add-canonical)
+          (numero symbolic simplify-sub-canonical)
           (numero symbolic simplify-mul-canonical)
-          (numero symbolic simplify-div-canonical)
-          (numero symbolic simplify-add-constants)
+          
+          (numero symbolic simplify-add)
+          (numero symbolic simplify-sub)
+          (numero symbolic simplify-mul)
+          (numero symbolic simplify-div)
+
+          (numero symbolic simplify-neg)
+
           (numero symbolic simplify-add-like-terms)
-          (numero symbolic simplify-mul-constants)
+          (numero symbolic simplify-sub-like-terms)
+
           (numero symbolic simplify-mul-factors)
+
+          (numero symbolic simplify-remove-sub)
+
           (numero symbolic simplify-pow)
-          (numero symbolic simplify-pretty)
+          
+          ;; (numero symbolic simplify-div-canonical)
+          ;; (numero symbolic simplify-add-constants)
+          
+          ;; (numero symbolic simplify-sqrt)
+          ;; (numero symbolic simplify-dot)
+          ;; (numero symbolic simplify-pretty)
+          ;; (numero symbolic simplify-abs)
+
           )
 
   (define-syntax compose-in-order
@@ -29,65 +49,68 @@
 
   ;; (define (simplify expr)
 
-  ;;   (let ((expr (rewrite simplify-remove-sub expr)))
+  ;;   (if (vector? expr)
 
-  ;;     (let ((expr (rewrite simplify-mul-canonical expr)))
+  ;;       (vector-map simplify expr)
 
-  ;;       (let ((expr (rewrite simplify-add-constants expr)))
+  ;;       (let ((expr (rewrite simplify-add-canonical expr)))
 
-  ;;         (let ((expr (rewrite simplify-add-constants expr)))
+  ;;         (let ((expr (rewrite (compose-in-order simplify-remove-sub
+  ;;                                                simplify-mul-canonical
+  ;;                                                simplify-div
+  ;;                                                simplify-sqrt
+  ;;                                                simplify-div-canonical
+  ;;                                                simplify-add-constants
+  ;;                                                simplify-add-like-terms
+  ;;                                                simplify-mul-constants
+  ;;                                                simplify-mul-factors
+  ;;                                                simplify-pow
+  ;;                                                simplify-dot
+  ;;                                                simplify-abs)
+  ;;                              expr)))
 
-  ;;           (let ((expr (rewrite simplify-add-like-terms expr)))
-
-  ;;             (let ((expr (rewrite simplify-mul-constants expr)))
-
-  ;;               (let ((expr (rewrite simplify-mul-factors expr)))
-
-  ;;                 expr))))))))
-
-  ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-  ;; (define (simplify expr)
-
-  ;;   (let ((expr (rewrite (compose-in-order simplify-add-canonical
-  ;;                                          simplify-remove-sub
-  ;;                                          simplify-mul-canonical
-  ;;                                          simplify-div-canonical
-  ;;                                          simplify-add-constants
-  ;;                                          simplify-add-like-terms
-  ;;                                          simplify-mul-constants
-  ;;                                          simplify-mul-factors
-  ;;                                          simplify-pow)
-  ;;                        expr)))
-
-
-
-  ;;     (rewrite (compose-in-order simplify-pretty
-  ;;                                simplify-mul-constants)
-  ;;              expr)))
+  ;;           (rewrite (compose-in-order simplify-pretty
+  ;;                                      simplify-mul-constants
+  ;;                                      simplify-pow
+  ;;                                      )
+  ;;                    expr)))))
 
   ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-  (define (simplify expr)
+  (define simplify-step
 
-    (let ((expr (rewrite simplify-add-canonical expr)))
+    (compose-in-order simplify-add-canonical
+                      simplify-sub-canonical
+                      simplify-mul-canonical
 
-      (let ((expr (rewrite (compose-in-order simplify-remove-sub
-                                             simplify-mul-canonical
-                                             simplify-div-canonical
-                                             simplify-add-constants
-                                             simplify-add-like-terms
-                                             simplify-mul-constants
-                                             simplify-mul-factors
-                                             simplify-pow)
-                           expr)))
+                      simplify-add
+                      simplify-sub
+                      simplify-mul
+                      simplify-div
 
-        (rewrite (compose-in-order simplify-pretty
-                                   simplify-mul-constants
-                                   simplify-pow
-                                   )
-                 expr))))
+                      simplify-neg
+
+                      simplify-add-like-terms
+                      simplify-sub-like-terms
+
+                      simplify-mul-factors
+
+                      simplify-pow
+
+                      ))
 
   ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  (define (simplify-basic expr)
+
+    (let ((expr (cond ((list?   expr) (map        simplify-basic expr))
+                      ((vector? expr) (vector-map simplify-basic expr))
+                      (else expr))))
+
+      (simplify-step expr)))
+
+  ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  (define (simplify expr) (rewrite simplify-basic expr))
 
   )
