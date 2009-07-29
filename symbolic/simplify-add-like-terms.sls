@@ -9,6 +9,12 @@
 
   (define (simplify-add-like-terms expr)
     (match expr
+
+      ;; (a + b)   where a and b are numbers
+      ( (and ('+ a b)
+             (? (lambda (_) (and (number? a) (number? b)))))
+        `(+ ,a ,b) )
+      
       ;; (a + b)   where a and b are like terms
       ( (and ('+ a b)
              (? (lambda (_) (like-terms? a b))))

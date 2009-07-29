@@ -1,7 +1,7 @@
 
 (library (numero symbolic simplify)
 
-  (export simplify simplify-step)
+  (export simplify simplify-step simplify-pre simplify-post)
 
   (import (rnrs)
           (xitomatl AS-match)

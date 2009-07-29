@@ -21,6 +21,10 @@
       ( ('* (? number? a) ('+ b (? number? c)))
         `(+ (* ,a ,b) ,(* a c)) )
 
+      ;; a * (b - c)    where a and c are numbers
+      (('* a ('- b c))
+       `(- (* ,a ,b) (* ,a ,c)))
+
       ;; a * (b * c)   where a and b are numbers
 
       ( ('* (? number? a) ('* (? number? b) c))

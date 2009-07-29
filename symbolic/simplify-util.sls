@@ -13,7 +13,10 @@
           contains-like-term?
           exponent)
 
-  (import (rnrs) (xitomatl AS-match))
+  (import (rnrs)
+          (xitomatl AS-match)
+          (numero symbolic simplify-parameters)
+          )
 
   (define (coefficient expr)
     (match expr
@@ -27,11 +30,25 @@
       ( ('* (? number?) b) b )
       ( else expr )))
 
+  (define (strip-pos-neg expr)
+    (match expr
+      (('- x) x)
+      (('+ x) x)
+      (else expr)))
+
+  ;; (define (like-terms? a b)
+  ;;   (if (and (number? a)
+  ;;            (number? b))
+  ;;       (if (simplify-exact?)
+  ;;           (and (exact? a)
+  ;;                (exact? b))
+  ;;           #t)
+  ;;       (equal? (strip-coefficient a)
+  ;;               (strip-coefficient b))))
+
   (define (like-terms? a b)
-    (or (equal? (strip-coefficient a)
-                (strip-coefficient b))
-        (and (number? a)
-             (number? b))))
+    (equal? (strip-coefficient a)
+            (strip-coefficient b)))
 
   (define (contains-like-term? expr term)
     (or (like-terms? expr term)

@@ -23,6 +23,9 @@
       (('/ (? number? n) (? vector? a))
        (vector-map (lambda (elt-a) `(/ ,n ,elt-a)) a))
 
+      (('/ (? vector? a) x)
+       (vector-map (lambda (elt-a) `(/ ,elt-a ,x)) a))
+
       (else expr)))
 
   )
