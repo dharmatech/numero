@@ -4,7 +4,7 @@
   (export infix)
   
   (import (rnrs)
-          (only (srfi :1) circular-list)
+          (only (srfi :1) circular-list list-index take drop)
           (srfi :64))
 
   ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -31,10 +31,27 @@
 
   (define operators (cdr (map car precedence-table)))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
   (define (operator? obj)
     (member obj operators))
+
+  ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  (define (args->operands expr)
+
+    (if (null? expr)
+
+        '()
+
+        (let ((i (list-index (lambda (x) (eq? x #\,)) expr)))
+
+          (if i
+
+              (cons (infix (take expr i))
+                    (args->operands (drop expr (+ i 1))))
+
+              (list (infix expr))))))  
 
   ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -117,10 +134,20 @@
 
                        (apply-operator)))
 
+
+                  ;; f(x)
+
+                  ;; f(x,y,z)
+                  
                   ((and (>= (length expr) 2)
                         (list? (list-ref expr 1)))
-                   (shunting-yard (cdr expr) operands (cons elt operators)))
 
+                   (shunting-yard (cdr (cdr expr))
+                                  (cons (cons elt
+                                              (args->operands (list-ref expr 1)))
+                                        operands)
+                                  operators))
+                                  
                   ((list? elt)
                    (shunting-yard (cdr expr)
                                   (cons (infix elt) operands)
