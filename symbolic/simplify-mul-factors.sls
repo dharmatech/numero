@@ -22,7 +22,10 @@
         `(+ (* ,a ,b) ,(* a c)) )
 
       ;; a * (b - c)    where a and c are numbers
-      (('* a ('- b c))
+      ((and ('* a ('- b c))
+            (? (lambda (_) (and (number? a)
+                                (number? c)))))
+       
        `(- (* ,a ,b) (* ,a ,c)))
 
       ;; a * (b * c)   where a and b are numbers
