@@ -1,5 +1,6 @@
 
 (import (numero symbolic infix)
+        (numero symbolic alg)
         (numero symbolic to-alg)
         (numero symbolic rewrite)
         (numero symbolic simplify)
@@ -9,7 +10,9 @@
         (numero symbolic solve-for)
         (numero symbolic subst)
 
-        (numero symbolic simplify-util))
+        (numero symbolic simplify-util)
+
+        (srfi :64))
 
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -48,7 +51,7 @@
 (simplify '(norm #(0 2)))
 
 
-
+(simplify '(dot #(1 2 3) #(-18 21 -8)))
 
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; simplify
@@ -56,7 +59,7 @@
 
 (to-alg
  (simplify
-  (infix '(a + b + 2 a))))
+  (alg "a + b + 2 a")))
 
 "3 * a + b"
 
@@ -66,19 +69,19 @@
 
 (to-alg
  (simplify
-  (D (infix '( 7 x ^ 5 - 3 x ^ 4 + 6 x ^ 2 + 3 x + 4 )) 'x)))
+  (D (alg "7 x^5 - 3 x^4 + 6 x^2 + 3 x + 4") 'x)))
 
 "3 + 35 * x ^ 4 - 12 * x ^ 3 + 12 * x"
 
 (to-alg
  (simplify
-  (D (infix '( ( 3 x - 2 ) / ( x ^ 2 + 7 ) )) 'x)))
+  (D (alg "( 3 x - 2 ) / ( x^2 + 7 )") 'x)))
 
 "(3 * x ^ 2 + 21 - 2 * x * (3 * x - 2)) / (x ^ 2 + 7) ^ 2"
 
 (to-alg
  (simplify
-  (D (infix '( (3 x - 2) / (2 x + 5) )) 'x)))
+  (D (alg "(3 x - 2) / (2 x + 5)") 'x)))
 
 "19 / (2 * x + 5) ^ 2"
 
@@ -88,7 +91,7 @@
  (simplify
   (expand
    (simplify
-    (D (D (D (D (infix '(sin(x) ^ 10)) 'x) 'x) 'x) 'x)))))
+    (D (D (D (D (alg "sin(x) ^ 10") 'x) 'x) 'x) 'x)))))
 
 "-4680 * (cos x) ^ 2 * (sin x) ^ 8 + 280 * (sin x) ^ 10 + 5040 * (cos x) ^ 4 * (sin x) ^ 6"
 
@@ -98,7 +101,7 @@
  (simplify
   (expand
    (simplify
-    (D (infix '(x * (2 x - 1) * (x + 2))) 'x)))))
+    (D (alg "x * (2 x - 1) * (x + 2)") 'x)))))
 
 "6 * x ^ 2 + 6 * x - 2"
 
@@ -107,7 +110,7 @@
 (to-alg
  (simplify
   (expand
-   (D (infix '( (x ^ 2 - 3) / (x + 4) )) 'x))))
+   (D (alg "(x^2 - 3) / (x+4)") 'x))))
 
 "(3 + x ^ 2 + 8 * x) / (8 * x + x ^ 2 + 16)"
 
@@ -115,7 +118,7 @@
 
 (to-alg
  (simplify
-  (D (infix '( (x ^ 5 - x + 2) / (x ^ 3 + 7) )) 'x)))
+  (D (alg "(x^5 - x + 2) / (x^3 + 7)") 'x)))
 
 "  ((5 * x ^ 4 - 1) * (x ^ 3 + 7) - 3 * x ^ 2 * (x ^ 5 - x + 2)) /
    (x ^ 3 + 7) ^ 2  "
@@ -126,7 +129,7 @@
  (simplify
   (expand
    (simplify
-    (D (infix '( (3 x ^ 7 + x ^ 5 - 2 x ^ 4 + x - 3) / x ^ 4 )) 'x)))))
+    (D (alg "(3 x^7 + x^5 - 2 x^4 + x - 3) / x^4 ") 'x)))))
 
 "-3 / x ^ 4 + 9 * x ^ 2 + 1 + 12 / x ^ 5"
 
@@ -134,7 +137,7 @@
 
 (to-alg
  (simplify
-  (D (infix '(1 / (3 x ^ 2 + 5) ^ 4)) 'x)))
+  (D (alg "1 / (3 x^2 + 5)^4") 'x)))
 
 "-24 * x / (3 * x ^ 2 + 5) ^ 5"
 
@@ -143,7 +146,7 @@
 (to-alg
  (simplify
   (expand
-   (infix '((a - b) ^ 3)))))
+   (alg "(a-b)^3"))))
 
 "-3 * a ^ 2 * b + 3 * a * b ^ 2 + a ^ 3 - b ^ 3"
 
@@ -151,11 +154,11 @@
 ;; solve-for
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(solve-for (infix '(2 x = 6)) 'x)
+(solve-for (alg "2 x = 6") 'x)
 
 (= x (/ 6 2))
 
-(solve-for (infix '(a b c / d = e)) 'c)
+(solve-for (alg "a b c / d = e") 'c)
 
 (= c (/ (* d e) (* a b)))
 
@@ -172,6 +175,8 @@
 ;; Define the equation:
 
 (define eq-1 (infix '( y(x) ^ 5 + x y(x) = 3 )))
+
+(define eq-1 (alg "y(x)^5 + x y(x) = 3 "))
 
 ;; Take the derivative of the whole equation:
 
@@ -218,7 +223,7 @@
 
 ;; Example 2.10
 
-(define f (infix '(x ^ 2 y + y ^ 3)))
+(define f (alg "x^2 y + y^3"))
 
 (to-alg
  (simplify
@@ -236,7 +241,7 @@
 
 ;; Example 2.11
 
-(define f (infix '( sin( x y ^ 2 ) / (x ^ 2 + 1) )))
+(define f (alg "sin( x y^2 ) / (x^2 + 1) "))
 
 (to-alg
  (simplify
@@ -254,7 +259,7 @@
 
 ;; Example 2.12
 
-(define f (infix '( e ^ (x ^ 2 y) + x y ^ 3 )))
+(define f (alg "e^(x^2 y) + x y^3 )"))
 
 (to-alg
  (simplify
@@ -301,7 +306,7 @@
 ;; Find the equation of the tangent plane to the surface z = x^2 + y^2 at the
 ;; point (1, 2, 5).
 
-(define f (infix '(x ^ 2 + y ^ 2)))
+(define f (alg "x^2 + y^2"))
 
 (define (df/dx x y)
   (simplify
@@ -330,7 +335,7 @@
 ;; Find the equation of the tangent plane to the surface x^2 + y^2 + z^2 = 9
 ;; at the point (2, 2, -1).
 
-(define F (infix '(x ^ 2 + y ^ 2 + z ^ 2 - 9)))
+(define F (alg "x^2 + y^2 + z^2 - 9)"))
 
 (define (dF/dx x y z)
   (simplify
